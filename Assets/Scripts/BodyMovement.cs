@@ -85,6 +85,8 @@ public class BodyMovement : MonoBehaviour
 
     IEnumerator BeginRound()
     {
+        _GS.friendMoves.Clear();
+        _GS.playerMoves.Clear();
         singingScript.InvokeRepeating("PlayCountdown", 0, 1.0f);
         yield return new WaitForSeconds(3.0f);
         singingScript.CancelInvoke();
@@ -138,7 +140,7 @@ public class BodyMovement : MonoBehaviour
             Debug.Log(_GS.friendMoves[i]);
         }
         _GS.SwitchState("playerTurn");
-        Debug.Log("Dance finished" + routineFinished);
+      
         //START PLAYER INPUT
     }
 
@@ -150,27 +152,27 @@ public class BodyMovement : MonoBehaviour
         switch (part)
         {
             case 0://LL
-                LLrig.AddForceAtPosition(-Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 2.0f), ForceMode2D.Impulse);
+                LLrig.AddForceAtPosition(-Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 0.3f), ForceMode2D.Impulse);
                 singingScript.PlayMelody(0);
                 _GS.friendMoves.Add("LL");
                 currentMove = "LL";
                 break;
             case 1: //RL
-                RLrig.AddForceAtPosition(Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 2.0f), ForceMode2D.Impulse);
+                RLrig.AddForceAtPosition(Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 0.3f), ForceMode2D.Impulse);
                 singingScript.PlayMelody(1);
                 _GS.friendMoves.Add("RL");
                 currentMove = "RL";
 
                 break;
             case 2: //LW
-                LWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x - 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse); //use tranform points for more accurate
+                LWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x - 2.5f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse); //use tranform points for more accurate
                 singingScript.PlayMelody(2);
                 _GS.friendMoves.Add("LW");
                 currentMove = "LW";
 
                 break;
             case 3: //RW
-                RWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);                singingScript.PlayMelody(3);
+                RWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 2.5f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);                singingScript.PlayMelody(3);
                 _GS.friendMoves.Add("RW");
                 currentMove = "RW";
 
@@ -237,26 +239,7 @@ public class BodyMovement : MonoBehaviour
             default:
                 break;
         }
-
         
-
-        if (moveNum == _GS.friendMoves.Count)
-        {
-            //CompareMoves();
-            for(int i = 0; i < _GS.friendMoves.Count; i++)
-            {
-                if(_GS.friendMoves[i] == _GS.playerMoves[i])
-                {
-                    correctMoves++;
-                }
-            }
-        }
-        if(correctMoves == _GS.friendMoves.Count)
-        {
-            //Debug.Log("Danced Right");
-            _GS.routineFinished = false;
-            //YOU DID THE DANCE
-        }
     }
 
     void CheckCurrentMove(string current)
@@ -264,6 +247,9 @@ public class BodyMovement : MonoBehaviour
         if (current == _GS.friendMoves[0])
         {
             _GS.PlayUI();
+
+            StartCoroutine(BeginRound());
+
         }
     }
     IEnumerator MovePart(string part)
