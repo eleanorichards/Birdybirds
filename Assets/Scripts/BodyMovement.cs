@@ -69,23 +69,26 @@ public class BodyMovement : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+       // if(playerBird)
+       // {
+            //if(routineFinished)
+            //{
+                Debug.Log("taking Input...");
+                TakeInput();
+
+           // }
+       // }
+
        if(!routineFinished)
         {
             if(!playerBird)
             {
                 DoADance(3);
-                inputNum = 0;
+                moveNum = 0;
                 //Carry Out Moves
             }
         }
-       else
-        {
-            if(playerBird)
-            {
-                TakeInput();
-            }
-
-        }
+      
     }
 
     private void DoADance(int danceLength)
@@ -97,7 +100,7 @@ public class BodyMovement : MonoBehaviour
             Debug.Log(friendMoves[i]);
         }
         routineFinished = true;
-        Debug.Log("Dance finished");
+        Debug.Log("Dance finished" + routineFinished);
         //START PLAYER INPUT
     }
 
@@ -133,9 +136,9 @@ public class BodyMovement : MonoBehaviour
                 break;
         }
     }
+
     private void TakeInput()
-    {
-        
+    {       
         if (Input.GetAxis("Vertical") >= 0.5f)
         {
             RLGlow.SetActive(false);
@@ -160,14 +163,14 @@ public class BodyMovement : MonoBehaviour
                     RWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);
                     playerMoves.Add("RW");
                     Debug.Log("Player RW");
-                    inputNum++;
+                    moveNum++;
                 }
                 else if (Input.GetAxis("Horizontal") < 0)
                 {
                     LWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x - 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse); //use tranform points for more accurate
                     playerMoves.Add("LW");
                     Debug.Log("Player LW");
-                    inputNum++;
+                    moveNum++;
                 }
                 break;
 
@@ -177,14 +180,14 @@ public class BodyMovement : MonoBehaviour
                     RLrig.AddForceAtPosition(Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 2.0f), ForceMode2D.Impulse);
                     playerMoves.Add("RL");
                     Debug.Log("Player RL");
-                    inputNum++;
+                    moveNum++;
                 }
                 if (Input.GetAxis("Horizontal") < 0)
                 {
                     LLrig.AddForceAtPosition(-Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 2.0f), ForceMode2D.Impulse);
                     playerMoves.Add("LL");
                     Debug.Log("Player LL");
-                    inputNum++;
+                    moveNum++;
                 }
                 break;
 
@@ -192,9 +195,9 @@ public class BodyMovement : MonoBehaviour
                 break;
         }
 
-        if(InputNum == friendMoves.Count)
+        if(moveNum == friendMoves.Count)
         {
-            CompareMoves();
+            //CompareMoves();
             for(int i = 0; i < friendMoves.Count; i++)
             {
                 if(friendMoves[i] == playerMoves[i])
@@ -205,6 +208,7 @@ public class BodyMovement : MonoBehaviour
         }
         if(correctMoves == friendMoves.Count)
         {
+            Debug.Log("Danced Right");
             //YOU DID THE DANCE
         }
     }
