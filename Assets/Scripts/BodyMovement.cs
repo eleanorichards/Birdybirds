@@ -10,11 +10,13 @@ public class BodyMovement : MonoBehaviour
         BOTTOM
     }
 
+    private bool playerBird;
+
     private BodyRegion region;
-    public GameObject LeftWing;
-    public GameObject RightWing;
-    public GameObject LeftLeg;
-    public GameObject RightLeg;
+    public Transform LeftWing;
+    public Transform RightWing;
+    public Transform LeftLeg;
+    public Transform RightLeg;
 
     public Rigidbody2D LWrig;
     public Rigidbody2D RWrig;
@@ -27,41 +29,113 @@ public class BodyMovement : MonoBehaviour
     private GameObject LLGlow;
     private GameObject RLGlow;
 
-    // Use this for initialization
+    private bool routineFinished = false;
+
+    public List<string> playerMoves = new List<string>();
+    public List<string> friendMoves = new List<string>();
+
+    string[] storedMoves = new string[] { "LL", "RL", "LW", "RW"};   // Use this for initialization
+
+    int moveNum = 0;
+    int correctMoves = 0;
+
     private void Start()
     {
-        LeftWing = GameObject.Find("LeftWing");
-        RightWing = GameObject.Find("RightWing");
-        LeftLeg = GameObject.Find("LeftLeg");
-        RightLeg = GameObject.Find("RightLeg");
+        if(gameObject.CompareTag("Player"))
+        {
+            playerBird = true;
+            Debug.Log(gameObject.name + "present");
+        }
+        else
+        {
+            playerBird = false;
+        }
+
+        LeftWing = transform.Find("LeftWing");
+        RightWing = transform.Find("RightWing");
+        LeftLeg = transform.Find("LeftLeg");
+        RightLeg = transform.Find("RightLeg");
         LWrig = LeftWing.GetComponent<Rigidbody2D>();
         RWrig = RightWing.GetComponent<Rigidbody2D>();
         LLrig = LeftLeg.GetComponent<Rigidbody2D>();
         RLrig = RightLeg.GetComponent<Rigidbody2D>();
 
-        RLGlow = GameObject.Find("RLGlow");
-        LLGlow = GameObject.Find("LLGlow");
-        LWGlow = GameObject.Find("LWGlow");
-        RWGlow = GameObject.Find("RWGlow");
+        RLGlow = RightLeg.transform.Find("RLGlow").GetComponent<GameObject>();
+        LLGlow = LeftLeg.transform.Find("LLGlow").GetComponent<GameObject>();
+        LWGlow = LeftWing.transform.Find("LWGlow").GetComponent<GameObject>();
+        RWGlow = RightWing.transform.Find("RWGlow").GetComponent<GameObject>();
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+       if(!routineFinished)
         {
-            RWrig.AddForceAtPosition(pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);
+            if(!playerBird)
+            {
+                DoADance(3);
+                inputNum = 0;
+                //Carry Out Moves
+            }
         }
-        if (Input.GetButtonDown("Fire2"))
+       else
         {
-            RWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);
-        }
+            if(playerBird)
+            {
+                TakeInput();
+            }
 
-        TakeInput();
+        }
     }
 
+    private void DoADance(int danceLength)
+    {
+        for(int i = 0; i < danceLength; i++)
+        {
+            MovePart(Random.Range(0, storedMoves.Length));
+            StartCoroutine(WaitForSeconds(2.0f));
+            Debug.Log(friendMoves[i]);
+        }
+        routineFinished = true;
+        Debug.Log("Dance finished");
+        //START PLAYER INPUT
+    }
+
+    IEnumerator WaitForSeconds(float time)
+    {
+        yield return new WaitForSeconds(time);
+    }
+
+    void MovePart(int part)
+    {
+        switch (part)
+        {
+            case 0://LL
+                LLrig.AddForceAtPosition(-Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 2.0f), ForceMode2D.Impulse);
+                friendMoves.Add("LL");
+                break;
+            case 1: //RL
+                RLrig.AddForceAtPosition(Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 2.0f), ForceMode2D.Impulse);
+                friendMoves.Add("RL");
+
+                break;
+            case 2: //LW
+                LWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x - 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse); //use tranform points for more accurate
+                friendMoves.Add("LW");
+
+                break;
+            case 3: //RW
+                RWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);
+                friendMoves.Add("RW");
+
+                break;
+            default:
+                break;
+        }
+    }
     private void TakeInput()
     {
+        
         if (Input.GetAxis("Vertical") >= 0.5f)
         {
             RLGlow.SetActive(false);
@@ -70,7 +144,7 @@ public class BodyMovement : MonoBehaviour
             LWGlow.SetActive(true);
             region = BodyRegion.TOP;
         }
-        if (Input.GetAxis("Vertical") <= -0.5f)
+        else if (Input.GetAxis("Vertical") <= -0.5f)
         {
             RWGlow.SetActive(false);
             LWGlow.SetActive(false);
@@ -84,26 +158,66 @@ public class BodyMovement : MonoBehaviour
                 if (Input.GetAxis("Horizontal") > 0)
                 {
                     RWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);
+                    playerMoves.Add("RW");
+                    Debug.Log("Player RW");
+                    inputNum++;
                 }
-                if (Input.GetAxis("Horizontal") < 0)
+                else if (Input.GetAxis("Horizontal") < 0)
                 {
-                    LWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);
+                    LWrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x - 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse); //use tranform points for more accurate
+                    playerMoves.Add("LW");
+                    Debug.Log("Player LW");
+                    inputNum++;
                 }
                 break;
 
             case BodyRegion.BOTTOM:
                 if (Input.GetAxis("Horizontal") > 0)
                 {
-                    RLrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);
+                    RLrig.AddForceAtPosition(Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 2.0f), ForceMode2D.Impulse);
+                    playerMoves.Add("RL");
+                    Debug.Log("Player RL");
+                    inputNum++;
                 }
                 if (Input.GetAxis("Horizontal") < 0)
                 {
-                    LLrig.AddForceAtPosition(-pushForce, new Vector2(RightWing.transform.position.x + 3.0f, RightWing.transform.position.y + 0.1f), ForceMode2D.Impulse);
+                    LLrig.AddForceAtPosition(-Vector2.right, new Vector2(RightWing.transform.position.x, RightWing.transform.position.y - 2.0f), ForceMode2D.Impulse);
+                    playerMoves.Add("LL");
+                    Debug.Log("Player LL");
+                    inputNum++;
                 }
                 break;
 
             default:
                 break;
         }
+
+        if(InputNum == friendMoves.Count)
+        {
+            CompareMoves();
+            for(int i = 0; i < friendMoves.Count; i++)
+            {
+                if(friendMoves[i] == playerMoves[i])
+                {
+                    correctMoves++;
+                }
+            }
+        }
+        if(correctMoves == friendMoves.Count)
+        {
+            //YOU DID THE DANCE
+        }
+    }
+
+    void SetGlow(string glowPart)
+    {
+        //if(glowPart)
+        //{
+        //    //setactivetrue
+        //}
+        //else
+        //{
+        //    //setactive false
+        //}
     }
 }
