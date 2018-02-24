@@ -12,7 +12,12 @@ public class GameState : MonoBehaviour {
 
     private AudioSource audioSource;
 
+    public AudioSource UIaudio;
+
     public AudioClip[] clips;
+
+    public List<string> playerMoves = new List<string>();
+    public List<string> friendMoves = new List<string>();
 
     public enum GameMode
     {
@@ -27,7 +32,7 @@ public class GameState : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        //audioSource = GameObject.GetComponentInChildren<AudioSource>();
+        //audioSource = GameObject.GetComponent<AudioSource>();
 	}
 	
 	// Update is called once per frame
@@ -51,6 +56,10 @@ public class GameState : MonoBehaviour {
         }
 	}
 
+    public void PlayUI()
+    {
+        UIaudio.Play();
+    }
     public void SwitchState(string state)
     {
         switch (state)
