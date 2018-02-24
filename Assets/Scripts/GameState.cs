@@ -19,6 +19,8 @@ public class GameState : MonoBehaviour {
     public List<string> playerMoves = new List<string>();
     public List<string> friendMoves = new List<string>();
 
+    public List<string> friendSounds = new List<string>();
+
     public enum GameMode
     {
         NONE,

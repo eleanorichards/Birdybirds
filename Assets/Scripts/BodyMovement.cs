@@ -252,6 +252,8 @@ public class BodyMovement : MonoBehaviour
 
         }
     }
+
+
     IEnumerator MovePart(string part)
     {
         switch (part)

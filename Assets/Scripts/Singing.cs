@@ -92,25 +92,44 @@ public class Singing : MonoBehaviour
             case 0:
                 audioSource.clip = notes[0];
                 audioSource.Play();
-
+                //CheckCurrentMove("LL");
                 break;
             case 1:
                 audioSource.clip = notes[1];
                 audioSource.Play();
+                //CheckCurrentMove("RL");
                 break;
             case 2:
                 audioSource.clip = notes[2];
                 audioSource.Play();
+                //CheckCurrentMove("LW");
                 break;
             case 3:
                 audioSource.clip = notes[3];
                 audioSource.Play();
+                //CheckCurrentMove("RW");
                 break;
             default:
                 break;
         }
     }
 
+    void CheckCurrentMove(string current)
+    {
+        if (current == _GS.friendMoves[0])
+        {
+            _GS.PlayUI();
+
+            //StartCoroutine(BeginRound());
+
+        }
+    }
+
+    IEnumerator ShowYes()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+    }
     public void PlayNextNote()
     {
         int noteNum = Random.Range(0, notes.Length);
